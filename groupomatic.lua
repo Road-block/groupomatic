@@ -1,5 +1,6 @@
 GrOM.Version_String = "4.0.0CU"
-local curSaveVersion = 4
+local curSaveVersion, _ = 4
+local currentDecurserMeanings = {"DISEASE","POISON","MAGIC","CURSE"}
 
 pcall(function()if not ScriptErrors then ScriptErrors = BasicScriptErrors ScriptErrors_Message = BasicScriptErrorsText end end)
 
@@ -56,9 +57,9 @@ end
 local function RolesNumToTable(roles)
 	if type(roles) ~= "number" then return end
 	
-	local newRoles = {false, false, false, false, false, false, false, false, false, false, false, false}
+	local newRoles = {false, false, false, false}--, false, false, false, false, false, false, false, false}
 	
-	for i = 1, 12 do
+	for i = 1, 4--[[12]] do
 		newRoles[i] = ( bit.band(roles, 2 ^ (i - 1)) > 0 )
 	end
 	
@@ -252,7 +253,45 @@ local roleIndex = {
 	["NONE"] = 4
 }
 
-specIndex = {
+local indexToRole = {"TANK", "HEALER", "MELEE_DPS", "RANGE_DPS"}
+
+local specIndex = {
+	["1:1"] = 3, -- warrior
+	["1:2"] = 3,
+	["1:3"] = 1,
+	["2:1"] = 2, -- paladin
+	["2:2"] = 1,
+	["2:3"] = 3,
+	["3:1"] = 4, -- hunter
+	["3:2"] = 4,
+	["3:3"] = 4,
+	["4:1"] = 3, -- rogue
+	["4:2"] = 3,
+	["4:3"] = 3,
+	["5:1"] = 2, -- priest
+	["5:2"] = 2,
+	["5:3"] = 4,
+	["6:1"] = 1, -- deathknight
+	["6:2"] = 3,
+	["6:3"] = 3,
+	["7:1"] = 4, -- shaman
+	["7:2"] = 3,
+	["7:3"] = 2,
+	["8:1"] = 4, -- mage
+	["8:2"] = 4,
+	["8:3"] = 4,
+	["9:1"] = 4, -- warlock
+	["9:2"] = 4,
+	["9:3"] = 4,
+	["10:1"] = 1, -- monk
+	["10:2"] = 2,
+	["10:3"] = 3,
+	["11:1"] = 4, -- druid
+	["11:2"] = 3,
+	["11:3"] = 2,
+	["11:4"] = 1,
+}
+--[[{
 	[62]  = 4,
 	[63]  = 4,
 	[64]  = 4,
@@ -287,7 +326,7 @@ specIndex = {
 	[268] = 1,
 	[269] = 3,
 	[270] = 2
-}
+}]]
 
 --[[specIndex[myclass]
 
@@ -956,11 +995,13 @@ function GrOM.RolesToString(roles)
 
 	local msg = "{"
 
-	for i=1, 11 do
-		local x = (roles[i]) and "true, " or "false, "
+	for i=1, 3 do
+		local rn = indexToRole[i]
+		local x = (roles[i]) and rn.."=true, " or rn.."=false, "
 		msg = msg .. x
 	end
-	local x = (roles[12]) and "true}" or "false}"
+	local rn = indexToRole[4]
+	local x = (roles[4]) and rn.."=true}" or rn.."=false}"
 	msg = msg .. x
 
 	return msg
@@ -968,20 +1009,39 @@ end
 
 local function GetMyRoles(u, isPrimary)
 	if u then dout(u) else dout("xxxu") end
-	local talentGroup = isPrimary and 1 or 2
+
 	if not u then u = "player" end
-	local a
-	local inspectUnit = u or "player"
+
+	local isInspect = not (UnitIsUnit(u,"player"))
+	local talentGroup
+	if isPrimary == true then
+		talentGroup = 1
+	elseif isPrimary == false then
+		talentGroup = 2
+	else
+		talentGroup = GetActiveTalentGroup(isInspect)
+	end
 	
 	if u == "raid0" then dout("x") return false end
 
-	local mySpec
+	--[[local mySpec
 	mySpec = GetInspectSpecialization(u)
 	
-	if not (mySpec and specIndex[mySpec]) then return false end
-	
-	roles = {false, false, false, false} 
-	roles[specIndex[mySpec]] = true
+	if not (mySpec and specIndex[mySpec]) then return false end]]
+	local tabId = GetPrimaryTalentTree(isInspect,false,talentGroup)
+	if not tabId then return false end
+	local _, classId = UnitClassBase(u)
+	local specKey = format("%d:%d",classId,tabId)
+	if not specIndex[specKey] then return false end
+	local roles = {false, false, false, false}
+	--roles[specIndex[mySpec]] = true
+	if specKey == "11:2" then -- feral
+		local _, _, _, _, thickHide, maxRank = GetTalentInfo(2, 1 ,isInspect, talentGroup)
+		if thickHide and thickHide > 0 then
+			specKey = "11:4" -- tank
+		end
+	end
+	roles[specIndex[specKey]] = true
 	return roles
 end
 
@@ -1740,7 +1800,6 @@ local function ArrangeManager()
 	FillInEmptyRoles(true)
 
 	ignoredExcluded = false
-	currentDecurserMeanings = {"DISEASE","POISON","MAGIC","CURSE"}
 	local optimalSetup = GrOM.Arrange()
 
 	if not optimalSetup then
@@ -1814,7 +1873,7 @@ local function BuildCurrentPlacementTable()
 		while k < #tt do
 			k = k + 1
 
-			local _,_,a = GetRaidRosterInfo(i)
+			local _,_,a = GetRaidRosterInfo(k)
 
 			if a and a > 0 and a < 9 then
 				currentRaidGroupPlacement[k] = a
@@ -2094,7 +2153,7 @@ function GrOM.TalentRequest_OnEvent(self, event, ...)
 		local u = "raid" .. raidInspectionIndex
 		if GrOM.InspectTainted then
 
-			GrOM.debug.talentCollection.lastStackTrace = tempLastTrace or ""
+			GrOM.debug.talentCollection.lastStackTrace = ""
 			GrOM.debug.talentCollection.reasons.addonConflict = GrOM.debug.talentCollection.reasons.addonConflict + 1
 
 			if L_CanInspectUnit(u) then
@@ -2131,7 +2190,7 @@ function GrOM.TalentRequest_OnEvent(self, event, ...)
 			end
 		end
 
-		local isPrimary = GetActiveSpecGroup(u) == 1
+		local isPrimary = GetActiveTalentGroup(not (UnitIsUnit(u,"player"))) == 1
 		local spec = GetMyRoles(u,isPrimary)
 		if spec == "ERR_BACKOFF" then return end
 		if spec == "ERR_BADCLASS" then
@@ -2195,7 +2254,7 @@ local function TalentRequest_OnUpdate()
 
 			while raidInspectionIndex < 40 and raidInspectionIndex > 0 do
 				raidInspectionIndex = raidInspectionIndex + 1
-				u = "raid" .. raidInspectionIndex
+				local u = "raid" .. raidInspectionIndex
 				if L_CanInspectUnit(u) then
 					GOMatic_TalentRequestFrame:RegisterEvent("INSPECT_READY")
 					NotifyInspect(u)
@@ -2571,8 +2630,8 @@ end
 
 function GrOM.DisplayCurrAndDest()
 	for i=1, 40 do
-		currentGroup = currentRaidGroupPlacement[i]
-		destGroup = optimalRaidGroupPlacement[i]
+		local currentGroup = currentRaidGroupPlacement[i]
+		local destGroup = optimalRaidGroupPlacement[i]
 		local msg = ""
 		if currentGroup then msg = currentGroup end
 		if destGroup then msg = msg .. "     " .. destGroup end
@@ -3051,7 +3110,7 @@ local function ValidateDecurseWhich(...)
 	for i = 1, maxD do
 		local dwTE = select(i, ...)
 		local fail = true
-		for _,v in pairs(decurseTypes) do
+		for _,v in pairs(currentDecurserMeanings) do
 			if v == dwTE then
 				table.insert(dwT, dwTE)
 				fail = false
@@ -3138,7 +3197,7 @@ function GrOM.Arrange(optimalSetup, unassignedMembers)
 
 	local group = optimalSetup[x]
 	local match = false
-	local class, prefSpec, requirePref, ignoreSpec = nil, nil, false, nil
+	local class, prefSpec, requirePref, ignoreSpec, loopWhile = nil, nil, false, nil, nil
 	local lastMatch, lastIndex = -1, -1
 	local limits = nil  --[1] = class, [2] = ROLE, [3] = number, [4] = enforce, [5] = operator (& or @)
 	local minPass = 0
@@ -3578,7 +3637,7 @@ function GrOM.RestoreRaid(restoreState)
 	end
 
 	ignoredExcluded = false
-	currentDecurserMeanings = {"DISEASE","POISON","MAGIC","CURSE"}
+
 	optimalSetup = GrOM.Arrange(optimalSetup, unassignedMembers)
 
 	if not optimalSetup then
@@ -5400,7 +5459,7 @@ function GrOM.LoadGUIFunctions()
 			class = "???"
 		end
 	
-		local color = RAID_CLASS_COLORS[class]
+		local color = (CUSTOM_CLASS_COLORS or RAID_CLASS_COLORS)[class]
 		if not color then color = GRAY_FONT_COLOR end
 		local r, g, b = color.r, color.g, color.b
 
@@ -5814,7 +5873,7 @@ function GrOM.LoadGUIFunctions()
 		end
 
 		local i = 2
-		nr = n .. i
+		local nr = n .. i
 
 		while FindEZTemplate(nr) do
 			i = i + 1

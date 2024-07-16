@@ -1,7 +1,7 @@
-## Interface: 70200
-## Title: Group O Matic
+## Interface: 40400
+## Title: Group-O-Matic
 ## Notes: Raid arrangement automator
-## Version: 4.7.0
+## Version: 40400.1
 ## Author: Akryn, llcorell
 ## SavedVariables: GrOM_G_Vars
 ## SavedVariablesPerCharacter: GrOM_Vars

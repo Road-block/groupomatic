@@ -27,12 +27,12 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Scripts>
 	</Button>
 
-	<Button name="GOMaticScrollFrameButtonTemplate" virtual="true">
+	<Button name="GOMaticScrollFrameButtonTemplate" inherits="BackdropTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="200" y="16"/>
 		</Size>
 		<Frames>
-			<Frame name="$parentData" setAllPoints="true">
+			<Frame name="$parentData" inherits="BackdropTemplate" setAllPoints="true">
 				<Layers>
 					<Layer level="BORDER">
 						<FontString name="$parentLabel" inherits="GameFontNormal">
@@ -47,12 +47,12 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
 	</Button>
 
-	<Button name="GOMaticScrollFrameCheckButtonTemplate" virtual="true">
+	<Button name="GOMaticScrollFrameCheckButtonTemplate" inherits="BackdropTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="200" y="16"/>
 		</Size>
 		<Frames>
-			<Frame name="$parentData" setAllPoints="true">
+			<Frame name="$parentData" inherits="BackdropTemplate" setAllPoints="true">
 				<Layers>
 					<Layer level="BORDER">
 						<FontString name="$parentLabel" inherits="GameFontNormal">
@@ -84,7 +84,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 	</Button>
 
 
-	<Frame name="GOMaticEZCreatorLimitsLineTemplate" virtual="true">
+	<Frame name="GOMaticEZCreatorLimitsLineTemplate" inherits="BackdropTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="350" y="20"/>
 		</Size>
@@ -181,7 +181,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Scripts>
 	</Frame>
 
-	<Frame name="GOMaticEZCreatorRulesLineTemplate" virtual="true">
+	<Frame name="GOMaticEZCreatorRulesLineTemplate" inherits="BackdropTemplate" virtual="true">
 		<Size>
 			<AbsDimension x="350" y="20"/>
 		</Size>
@@ -341,25 +341,20 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Layers>
 	</EditBox>
 
-	<Frame name="GOMatic" frameStrata="HIGH" toplevel="true" movable="true" enableMouse="true" clampedToScreen="true" hidden="true">
+	<Frame name="GOMatic" frameStrata="HIGH" toplevel="true" movable="true" enableMouse="true" clampedToScreen="true" hidden="true" inherits="BackdropTemplate" parent="UIParent">
 		<Size>
 			<AbsDimension x="67" y="166"/>
 		</Size>
 		<Anchors>
-			<Anchor point="TOP"><Offset><AbsDimension x="240" y="-20"/></Offset></Anchor>
+			<Anchor point="TOP">
+				<Offset>
+					<AbsDimension x="240" y="-20"/>
+				</Offset>
+			</Anchor>
 		</Anchors>
-		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
-			<BackgroundInsets>
-				<AbsInset left="5" right="5" top="5" bottom="5"/>
-			</BackgroundInsets>
-			<TileSize>
-				<AbsValue val="16"/>
-			</TileSize>
-			<EdgeSize>
-				<AbsValue val="16"/>
-			</EdgeSize>
-		</Backdrop>
-
+		<KeyValues>
+			<KeyValue key="backdropInfo" value="BACKDROP_TUTORIAL_16_16" type="global"/> <!--  BACKDROP_DARK_DIALOG_32_32-->
+		</KeyValues>
 
 		<Layers>
 			<Layer level="BORDER">
@@ -495,6 +490,15 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 						</Anchor>
 					</Anchors>
 				</FontString>
+			</Layer>
+			<Layer level="BACKGROUND">
+				<Texture>
+					<Anchors>
+						<Anchor point="TOPLEFT" x="-5" y="5"/>
+						<Anchor point="BOTTOMRIGHT" x="5" y="-5"/>
+					</Anchors>
+					<Color r="0" g="0" b="0" a="0.7"/>
+				</Texture>
 			</Layer>
 		</Layers>
 
@@ -884,30 +888,6 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 					</OnShow>
 				</Scripts>
 			</CheckButton>
-
-		<!--	<Button name="$parentExclude" inherits="GOMaticMenuButtonTemplate" text="Exclude" hidden="true">
-				<Size>
-					<AbsDimension x="77" y="20"/>
-				</Size>
-				<Anchors>
-					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSure">
-						<Offset>
-							<AbsDimension x="190" y="0"/>
-						</Offset>
-					</Anchor>
-				</Anchors>
-				<Scripts>
-					<OnEnter>
-						GameTooltip_AddNewbieTip(self, GrOM.Localization.excludetip1, 1.0, 1.0, 1.0, GrOM.Localization.excludetip2, 1);
-					</OnEnter>
-					<OnLeave>
-						GameTooltip:Hide();
-					</OnLeave>
-					<OnClick>
-						GrOM.ExcludeClick()
-					</OnClick>
-				</Scripts>
-			</Button> -->
 
 			 <Frame name="$parentExtrasMenu" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
 				<Size>
@@ -1575,7 +1555,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 				</Scripts>
 			</Button>
 
-			<Frame name="$parentEZCreator" hidden="true">
+			<Frame name="$parentEZCreator" inherits="BackdropTemplate" hidden="true">
 				<Size>
 					<AbsDimension x="300" y="300"/>
 				</Size>
@@ -1865,7 +1845,7 @@ C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
 		</Scripts>
 	</Frame>
 	
-	<Frame name="GOMaticAnchorFrame">
+	<Frame name="GOMaticAnchorFrame" inherits="BackdropTemplate">
 		<Size>
 			<AbsDimension x="2" y="2"/>
 		</Size>

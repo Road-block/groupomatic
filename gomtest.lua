@@ -188,7 +188,7 @@ local currRaidTestOriginal = {{
  --put the test case to run here
  
 --same as above except with another 4 people in group 3. by default rules, the druid F should get put into the tanking group along with the 2 tanks, the warrior, and the lock8
-currRaidTestOriginal = {{},{},{
+local currRaidTestOriginal = {{},{},{
 		{5,"ROGUE","dps1",{false,false,true,false}},
 		{4,"DRUID","healer1",{false, true}},
 		{6,"DRUID","healer2",{false, true}},
@@ -231,7 +231,7 @@ function GOMTEST_GetNumPartyMembers()
 	return num
 end
 
-function GOMTEST_CanInspectUnit()
+function GOMTEST_CanInspectUnit(u)
 	return not UnitIsUnit(u, "player")
 end
 

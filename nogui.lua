@@ -1,6 +1,7 @@
 if not GOMatic then
 	GrOM.guiUnloaded = true
-	local f = CreateFrame("Frame", "GOMatic")
+	local f = CreateFrame("Frame", "GOMatic", UIParent, "BackdropTemplate")
+	f:SetBackdrop(BACKDROP_TUTORIAL_16_16)
 	GrOM.OnLoad(f)
 	f:SetScript("OnEvent", GrOM.OnEvent)
 	function GrOM.UpdateButtons()end
