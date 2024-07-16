@@ -1,0 +1,1880 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+C:\Projects\WoW\Bin\Interface\FrameXML\UI.xsd">
+
+	<Texture name="GOMaticButtonUpTexture" file="Interface\GLUES\COMMON\Glue-Panel-Button-Up-Blue" virtual="true">
+		<TexCoords left="0.03" right="0.54" top="0.11" bottom="0.54"/>
+	</Texture>
+	<Texture name="GOMaticButtonDownTexture" file="Interface\GLUES\COMMON\Glue-Panel-Button-Down-Blue" virtual="true">
+		<TexCoords left="0.03" right="0.54" top="0.11" bottom="0.54"/>
+	</Texture>
+	<Texture name="GOMaticButtonDisabledTexture" file="Interface\GLUES\COMMON\Glue-Panel-Button-Disabed-Blue" virtual="true">
+		<TexCoords left="0.03" right="0.54" top="0.11" bottom="0.54"/>
+	</Texture>
+	<Texture name="GOMaticButtonHighlightTexture" file="Interface\GLUES\COMMON\Glue-Panel-Button-Highlight-Blue" alphaMode="ADD" virtual="true">
+		<TexCoords left="0.03" right="0.54" top="0.11" bottom="0.54"/>
+	</Texture>
+
+	<Button name ="GOMaticMenuButtonTemplate" inherits="GameMenuButtonTemplate" virtual="true">
+		<NormalFont style="GameFontWhite"/>
+		<HighlightTexture inherits="GOMaticButtonHighlightTexture"/>
+		<PushedTexture inherits="GOMaticButtonDownTexture"/>
+		<!--<DisabledTexture inherits="GOMaticButtonDisabledTexture"/>-->
+		<NormalTexture inherits="GOMaticButtonUpTexture"/>
+		<Scripts>
+			<OnShow>
+				GrOM.UIFrameFadeIn(self, .3, 0, 1)
+			</OnShow>
+		</Scripts>
+	</Button>
+
+	<Button name="GOMaticScrollFrameButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="16"/>
+		</Size>
+		<Frames>
+			<Frame name="$parentData" setAllPoints="true">
+				<Layers>
+					<Layer level="BORDER">
+						<FontString name="$parentLabel" inherits="GameFontNormal">
+							<Anchor point="TOPLEFT">
+								<AbsDimension x="5" y="-2"/>
+							</Anchor>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+		<HighlightTexture file="Interface\QuestFrame\UI-QuestTitleHighlight" alphaMode="ADD"/>
+	</Button>
+
+	<Button name="GOMaticScrollFrameCheckButtonTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="16"/>
+		</Size>
+		<Frames>
+			<Frame name="$parentData" setAllPoints="true">
+				<Layers>
+					<Layer level="BORDER">
+						<FontString name="$parentLabel" inherits="GameFontNormal">
+							<Anchor point="TOPLEFT">
+								<AbsDimension x="5" y="-2"/>
+							</Anchor>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<CheckButton name="$parentCheck" inherits="OptionsCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parentData">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.AddOrRemoveSync(self)
+					</OnClick>
+				</Scripts>
+			</CheckButton>
+		</Frames>
+	</Button>
+
+
+	<Frame name="GOMaticEZCreatorLimitsLineTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="350" y="20"/>
+		</Size>
+		<Frames>
+
+			<Button name="$parentMinusButton" inherits="GOMaticMenuButtonTemplate" text="-">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.RemoveLimitsLine(tonumber(self:GetParent():GetName():match("(%d+)")))
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<EditBox name="$parentNumberBox" inherits="InputBoxTemplate" font="GameFontNormal">
+				<Size>
+					<AbsDimension x="20" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMinusButton">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetNumeric(true)
+						self:SetAutoFocus(false)
+						self:SetMaxLetters(1)
+					</OnLoad>
+				</Scripts>
+			</EditBox>
+
+			<Frame name="$parentClassMenu" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Size>
+					<AbsDimension x="130" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentNumberBox">
+						<Offset>
+							<AbsDimension x="-5" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.ClassDropdown_Initialize)
+						self:SetScript("OnUpdate", function(self) local x = UIDropDownMenu_GetSelectedValue(self) or GrOM.Localization.any if x:len() > 15 then x = x:sub(1, 13).."..." end _G[self:GetName().."Text"]:SetText(x) self:SetScript("OnUpdate", nil) end)
+					</OnShow>
+					<OnLoad>
+						_G[self:GetName().."Button"]:HookScript("OnClick", function() GrOM.LastMenuClicked = self end)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentSpecMenu" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Size>
+					<AbsDimension x="140" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentClassMenu">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.SpecDropdown_Initialize)
+						self:SetScript("OnUpdate", function(self) local x = UIDropDownMenu_GetSelectedValue(self) or GrOM.Localization.any if x:len() > 15 then x = x:sub(1, 13).."..." end _G[self:GetName().."Text"]:SetText(x) self:SetScript("OnUpdate", nil) end)
+					</OnShow>
+					<OnLoad>
+						_G[self:GetName().."Button"]:HookScript("OnClick", function() GrOM.LastMenuClicked = self end)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+
+		</Frames>
+		<Scripts>
+			<OnShow>
+				GrOM.UIFrameFadeIn(self, .3, 0, 1)
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="GOMaticEZCreatorRulesLineTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="350" y="20"/>
+		</Size>
+		<Frames>
+
+			<Button name="$parentMinusButton" inherits="GOMaticMenuButtonTemplate" text="-">
+				<Size>
+					<AbsDimension x="25" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.RemoveRulesLine(tonumber(self:GetParent():GetName():match("(%d+)")))
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Frame name="$parentClassMenu" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Size>
+					<AbsDimension x="130" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMinusButton">
+						<Offset>
+							<AbsDimension x="-10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.ClassDropdown_Initialize)
+						self:SetScript("OnUpdate", function(self) local x = UIDropDownMenu_GetSelectedValue(self) or GrOM.Localization.any if x:len() > 15 then x = x:sub(1, 13).."..." end _G[self:GetName().."Text"]:SetText(x) self:SetScript("OnUpdate", nil) end)
+					</OnShow>
+					<OnLoad>
+						_G[self:GetName().."Button"]:HookScript("OnClick", function() GrOM.LastMenuClicked = self end)
+						UIDropDownMenu_SetWidth(self, 70)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentSpecMenu" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Size>
+					<AbsDimension x="140" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentClassMenu">
+						<Offset>
+							<AbsDimension x="-30" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.PrefSpecDropdown_Initialize)
+						self:SetScript("OnUpdate", function(self) local x = UIDropDownMenu_GetSelectedValue(self) or "TANK" if x:len() > 15 then x = x:sub(1, 13).."..." end _G[self:GetName().."Text"]:SetText(x) self:SetScript("OnUpdate", nil) end)
+					</OnShow>
+					<OnLoad>
+						_G[self:GetName().."Button"]:HookScript("OnClick", function() GrOM.LastMenuClicked = self end)
+						UIDropDownMenu_SetWidth(self, 140)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<Frame name="$parentIgnoreSpecMenu" inherits="UIDropDownMenuTemplate" enableMouse="true">
+				<Size>
+					<AbsDimension x="140" y="25"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentSpecMenu">
+						<Offset>
+							<AbsDimension x="-30" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.IgnoreSpecDropdown_Initialize)
+						self:SetScript("OnUpdate", function(self) local x = UIDropDownMenu_GetSelectedValue(self) or GrOM.Localization.none if x:len() > 15 then x = x:sub(1, 13).."..." end _G[self:GetName().."Text"]:SetText(x) self:SetScript("OnUpdate", nil) end)
+						self:Hide()
+					</OnShow>
+					<OnLoad>
+						_G[self:GetName().."Button"]:HookScript("OnClick", function() GrOM.LastMenuClicked = self end)
+						UIDropDownMenu_SetWidth(self, 70)
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="$parentRequireSpec" inherits="OptionsCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentSpecMenu">
+						<Offset>
+							<AbsDimension x="-16" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						self:SetFrameLevel(_G[self:GetParent():GetName().."IgnoreSpecMenu"]:GetFrameLevel()+1)
+						_G[self:GetName().."Text"]:SetFont("Fonts\\FRIZQT__.TTF", 9)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentLoop" inherits="OptionsCheckButtonTemplate">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentRequireSpec">
+						<Offset>
+							<AbsDimension x="0" y="4"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						self:SetFrameLevel(_G[self:GetParent():GetName().."IgnoreSpecMenu"]:GetFrameLevel()+1)						
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+
+		</Frames>
+		<Scripts>
+			<OnShow>
+				GrOM.UIFrameFadeIn(self, .3, 0, 1)
+			</OnShow>
+		</Scripts>
+	</Frame>
+	
+	
+	<EditBox name="GOMaticCustomRaidEditBoxTemplate" virtual="true" inherits="InputBoxTemplate">
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentClassText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="57" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</EditBox>
+
+	<Frame name="GOMatic" frameStrata="HIGH" toplevel="true" movable="true" enableMouse="true" clampedToScreen="true" hidden="true">
+		<Size>
+			<AbsDimension x="67" y="166"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOP"><Offset><AbsDimension x="240" y="-20"/></Offset></Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\Tooltips\UI-Tooltip-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="5" right="5" top="5" bottom="5"/>
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="16"/>
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="16"/>
+			</EdgeSize>
+		</Backdrop>
+
+
+		<Layers>
+			<Layer level="BORDER">
+				<FontString name="$parentTitleText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="57" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="5" y="-5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTitleText2" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="300" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTitleText" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-20" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentTemplateText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="150" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTitleText" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="160" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentExcludeText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="150" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTitleText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentThrottleText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="380" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTitleText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentMinLevelText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="380" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTitleText">
+							<Offset>
+								<AbsDimension x="0" y="-145"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentEditSavesText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="380" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTitleText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentOnMemberAddText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="380" y="48"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTitleText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentOnMemberAddText2" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="380" y="48"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentOnMemberAddText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-20"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentSyncPaneText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="380" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentTitleText" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="-182"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentRestoreMethodText" enableMouse="false" inherits="GameFontNormalSmall" justifyH="LEFT" hidden="true">
+					<Size>
+						<AbsDimension x="150" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parentTemplateText" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="20" y="-297"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+
+
+		<Frames>
+
+			<Frame name="$parentDropDown" inherits="UIDropDownMenuTemplate" id="312" hidden="true">
+				<Size>
+					<AbsDimension x="10" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+						<Offset>
+							<AbsDimension x="-10" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GOMaticDropdown_Initialize)
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<Button name="$parentSave" inherits="GOMaticMenuButtonTemplate" text="Save" hidden="false">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentTitleText">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.savetip1, 1.0, 1.0, 1.0, GrOM.Localization.savetip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.ShowSaveMenu()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentRestore" inherits="GOMaticMenuButtonTemplate" text="Restore" hidden="false">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSave">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.restoretip1, 1.0, 1.0, 1.0, GrOM.Localization.restoretip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.ShowRestoreMenu()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentAuto" inherits="GOMaticMenuButtonTemplate" text="Auto" hidden="false">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentRestore">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.autotip1, 1.0, 1.0, 1.0, GrOM.Localization.autotip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.AutoClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentMore" inherits="GOMaticMenuButtonTemplate" text="More" hidden="false">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentAuto">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.MoreClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentLess" inherits="GOMaticMenuButtonTemplate" text="Less" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentAuto">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.LessClick()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentHide" inherits="GOMaticMenuButtonTemplate" text="Hide" hidden="false">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentAuto">
+						<Offset>
+							<AbsDimension x="0" y="-35"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.hidetip1, 1.0, 1.0, 1.0, GrOM.Localization.hidetip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM_Vars.ShowGUI = false
+						self:GetParent():Hide()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentPing" inherits="GOMaticMenuButtonTemplate" text="Ping" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSave">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.pingtip1, 1.0, 1.0, 1.0, GrOM.Localization.pingtip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.Ping()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentCancel" inherits="GOMaticMenuButtonTemplate" text="Cancel" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parentPing">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.Cancel()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentSplit" inherits="GOMaticMenuButtonTemplate" text="Split Raid" hidden="true">
+				<Size>
+					<AbsDimension x="105" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentCancel">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.SetTemplateAndAA("Split")
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentGroupRoles" inherits="GOMaticMenuButtonTemplate" text="Melee together" hidden="true">
+				<Size>
+					<AbsDimension x="105" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSplit">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.SetTemplateAndAA()
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<Button name="$parentGroupClasses" inherits="GOMaticMenuButtonTemplate" text="Group Classes" hidden="true">
+				<Size>
+					<AbsDimension x="105" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentGroupRoles">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.SetTemplateAndAA("Group_by_class")
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			 <Frame name="$parentTemplateMenu" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentCancel">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_SetWidth(self, 203)
+						UIDropDownMenu_Initialize(self, GOMaticTemplateDropdown_Initialize)
+						UIDropDownMenu_SetSelectedValue(self,GrOM.GetCurrentTemplate())
+						_G[self:GetName().."Text"]:SetText(select(2,GrOM.GetCurrentTemplate()))
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="$parentOverrideRemote" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentPing">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.overrideremotetip1, 1.0, 1.0, 1.0, GrOM.Localization.overrideremotetip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentSilence" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentOverrideRemote">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.silencetip1, 1.0, 1.0, 1.0, GrOM.Localization.silencetip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="$parentNukeCache" inherits="GOMaticMenuButtonTemplate" text="Clear Cache" hidden="true">
+				<Size>
+					<AbsDimension x="90" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSilence">
+						<Offset>
+							<AbsDimension x="180" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						StaticPopup_Show("GOMatic_DO_NUKE")
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<CheckButton name="$parentSure" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentSilence">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.suretip1, 1.0, 1.0, 1.0, GrOM.Localization.suretip2, 1)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentContinuousScan" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentOverrideRemote">
+						<Offset>
+							<AbsDimension x="100" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.continuousscantip1, 1.0, 1.0, 1.0, GrOM.Localization.continuousscantip2, 1)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+		<!--	<Button name="$parentExclude" inherits="GOMaticMenuButtonTemplate" text="Exclude" hidden="true">
+				<Size>
+					<AbsDimension x="77" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSure">
+						<Offset>
+							<AbsDimension x="190" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.excludetip1, 1.0, 1.0, 1.0, GrOM.Localization.excludetip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.ExcludeClick()
+					</OnClick>
+				</Scripts>
+			</Button> -->
+
+			 <Frame name="$parentExtrasMenu" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentSure">
+						<Offset>
+							<AbsDimension x="120" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GOMaticExtrasDropdown_Initialize)
+						local x, y = GrOM.GetCurrentExtrasPane()
+						UIDropDownMenu_SetSelectedValue(self, x)
+						_G[self:GetName().."Text"]:SetText(y)
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="$parentExcludeSaves" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentExcludeText">
+						<Offset>
+							<AbsDimension x="55" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.excludesavetip2, 1.0, 1.0, 1.0, GrOM.Localization.excludesavetip2, 1)
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide()
+					</OnLeave>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<Slider name="$parentThrottleSlider" inherits="OptionsSliderTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="380" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						_G[self:GetName().."Low"]:SetText("1")
+						_G[self:GetName().."High"]:SetText("20")
+						self:SetMinMaxValues(1, 20)
+						self:SetValueStep(1)
+					</OnLoad>
+					<OnValueChanged>
+						GrOM.UpdateAutoThrottle(value)
+					</OnValueChanged>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</Slider>
+
+			<EditBox name="$parentIgnoreBelowLevel" inherits="InputBoxTemplate" font="GameFontNormal" hidden="true">
+				<Size>
+					<AbsDimension x="80" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="40" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetNumeric(true)
+					</OnLoad>
+					<OnShow>
+						self:SetText(tostring(GrOM_Vars.ignoreBelowLevel))
+						self:SetFocus()
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+					<OnEnterPressed>
+						self:ClearFocus()
+						self:SetAutoFocus(false)
+					</OnEnterPressed>
+					<OnEditFocusLost>
+						GrOM.MinLevelInputChanged(self)
+					</OnEditFocusLost>
+				</Scripts>
+			</EditBox>
+
+			<CheckButton name="$parentIgnoreDead" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentIgnoreBelowLevel">
+						<Offset>
+							<AbsDimension x="55" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetHitRectInsets(0, -40, 0, 0)
+					</OnLoad>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<CheckButton name="$parentIgnoreOffline" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentIgnoreDead">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetHitRectInsets(0, -40, 0, 0)
+					</OnLoad>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+
+			<ScrollFrame name="$parentMVPScrollFrame" inherits="FauxScrollFrameTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="200" y="150"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						GrOM.ScrollFrameUpdate(self)
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+					<OnVerticalScroll>
+       						GrOM.FauxScrollFrame_OnVerticalScroll(self, offset, (GrOM.GetScrollFrameButtonStats(self:GetHeight())), GrOM.ScrollFrameUpdate)
+     					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Button name="$parentAddMVP" inherits="GOMaticMenuButtonTemplate" text="Add**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentMVPScrollFrame">
+						<Offset>
+							<AbsDimension x="30" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						StaticPopup_Show("GOMATIC_ADD_MVP")
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentDeleteMVP" inherits="GOMaticMenuButtonTemplate" text="Remove**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentAddMVP">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.DeleteMVP()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentDeleteAllMVPs" inherits="GOMaticMenuButtonTemplate" text="Remove All**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDeleteMVP">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						StaticPopup_Show("GOMATIC_CLEAR_MVP")
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentDemoteMVP" inherits="GOMaticMenuButtonTemplate" text="Move Down**" hidden="true">
+				<Size>
+					<AbsDimension x="95" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentMVPScrollFrame">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.demotemvptip1, 1.0, 1.0, 1.0, GrOM.Localization.demotemvptip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.DemoteMVP()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentPromoteMVP" inherits="GOMaticMenuButtonTemplate" text="Move Up**" hidden="true">
+				<Size>
+					<AbsDimension x="95" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentDemoteMVP">
+						<Offset>
+							<AbsDimension x="15" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, GrOM.Localization.promotemvptip1, 1.0, 1.0, 1.0, GrOM.Localization.promotemvptip2, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnClick>
+						GrOM.PromoteMVP()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<ScrollFrame name="$parentSavesScrollFrame" inherits="FauxScrollFrameTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="200" y="180"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						GrOM.ScrollFrameUpdate(self)
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+					<OnVerticalScroll>
+       						GrOM.FauxScrollFrame_OnVerticalScroll(self, offset, (GrOM.GetScrollFrameButtonStats(self:GetHeight())), GrOM.ScrollFrameUpdate)
+     					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Button name="$parentDeleteSave" inherits="GOMaticMenuButtonTemplate" text="del**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentSavesScrollFrame">
+						<Offset>
+							<AbsDimension x="30" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.DeleteSave()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentRenameSave" inherits="GOMaticMenuButtonTemplate" text="Remove**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDeleteSave">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						StaticPopup_Show("GOMATIC_RENAME_SAVE")
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentEditSave" inherits="GOMaticMenuButtonTemplate" text="Remove**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentRenameSave">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.EditSave()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentNewBlankSave" inherits="GOMaticMenuButtonTemplate" text="Remove**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentEditSave">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.EditSave(true)
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			 <Frame name="$parentRestoreMethodMenu" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentNewBlankSave">
+						<Offset>
+							<AbsDimension x="0" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GOMaticRestoreMethodDropdown_Initialize)
+						UIDropDownMenu_SetSelectedValue(self, GrOM.GetCurrentRestoreMethod())
+						_G[self:GetName().."Text"]:SetText(select(2,GrOM.GetCurrentRestoreMethod()))
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</Frame>
+			
+			<!--stuff on member add-->
+			<Frame name="$parentAutoAutoMenu1" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="0" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.AutoAutoMenu1_Initialize)
+						UIDropDownMenu_SetSelectedValue(self, GrOM.GetCurrentAutoAuto(1))
+						_G[self:GetName().."Text"]:SetText(select(2,GrOM.GetCurrentAutoAuto(1)))
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+						self.t:SetText(tostring(GrOM.raidSize1) .. ":")
+					</OnShow>
+					<OnLoad>
+						self.t = self:CreateFontString("$parentText","ARTWORK","GameFontNormal")
+						self.t:SetWidth(60)
+						self.t:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -5, 0)						
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			
+			<Frame name="$parentAutoAutoMenu2" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentAutoAutoMenu1">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.AutoAutoMenu2_Initialize)
+						UIDropDownMenu_SetSelectedValue(self, GrOM.GetCurrentAutoAuto(2))
+						_G[self:GetName().."Text"]:SetText(select(2,GrOM.GetCurrentAutoAuto(2)))
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+						self.t:SetText(tostring(GrOM.raidSize2) .. ":")
+					</OnShow>
+					<OnLoad>
+						self.t = self:CreateFontString("$parentText","ARTWORK","GameFontNormal")
+						self.t:SetWidth(60)
+						self.t:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -5, 0)						
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			
+			<Frame name="$parentAutoAutoMenu3" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentAutoAutoMenu2">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.AutoAutoMenu3_Initialize)
+						UIDropDownMenu_SetSelectedValue(self, GrOM.GetCurrentAutoAuto(3))
+						_G[self:GetName().."Text"]:SetText(select(2,GrOM.GetCurrentAutoAuto(3)))
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+						self.t:SetText(tostring(GrOM.raidSize3) .. ":")
+					</OnShow>
+					<OnLoad>
+						self.t = self:CreateFontString("$parentText","ARTWORK","GameFontNormal")
+						self.t:SetWidth(60)
+						self.t:SetPoint("BOTTOMLEFT", self, "TOPLEFT", -5, 0)						
+					</OnLoad>
+				</Scripts>
+			</Frame>			
+			
+			<Frame name="$parentAutoPlaceMenu" inherits="UIDropDownMenuTemplate" enableMouse="true" hidden="true">
+				<Size>
+					<AbsDimension x="55" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="170" y="-60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						UIDropDownMenu_Initialize(self, GrOM.AutoPlaceMenu_Initialize)
+						UIDropDownMenu_SetSelectedValue(self, GrOM.GetCurrentAutoPlace())
+						_G[self:GetName().."Text"]:SetText(select(2,GrOM.GetCurrentAutoPlace()))
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="$parentOnlyDoMemberAddActionsAsLeaderCheck" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentAutoPlaceMenu">
+						<Offset>
+							<AbsDimension x="20" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+						local t = _G[self:GetName().."Text"]
+						t:SetJustifyH("LEFT")
+						t:SetWidth(170)
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+			
+			<!--stuff on member add end-->
+
+			<EditBox name="$parentEditSaveNameInputBox" inherits="InputBoxTemplate" font="GameFontNormal" hidden="true">
+				<Size>
+					<AbsDimension x="200" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="40" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnTabPressed>
+						GOMaticCustomRaidEditBox1:SetFocus()
+					</OnTabPressed>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</EditBox>
+
+			<Button name="$parentSaveCustom" inherits="GOMaticMenuButtonTemplate" text="Remove**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentEditSaveNameInputBox">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.SaveCustomRaid()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentCancelCustom" inherits="GOMaticMenuButtonTemplate" text="Remove**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentSaveCustom">
+						<Offset>
+							<AbsDimension x="10" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.OpenExtrasPane("saves")
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<ScrollFrame name="$parentEZTemplateScrollFrame" inherits="FauxScrollFrameTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="200" y="180"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						GrOM.ScrollFrameUpdate(self)
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+					<OnVerticalScroll>
+       						GrOM.FauxScrollFrame_OnVerticalScroll(self, offset, (GrOM.GetScrollFrameButtonStats(self:GetHeight())), GrOM.ScrollFrameUpdate)
+     					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Button name="$parentAddEZTemplate" inherits="GOMaticMenuButtonTemplate" text="Add**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentEZTemplateScrollFrame">
+						<Offset>
+							<AbsDimension x="30" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.NewEZTemplate()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentDeleteEZTemplate" inherits="GOMaticMenuButtonTemplate" text="Remove**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentAddEZTemplate">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.DeleteEZTemplate()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentRenameEZTemplate" inherits="GOMaticMenuButtonTemplate" text="Remove All**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentDeleteEZTemplate">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						StaticPopup_Show("GOMATIC_RENAME_EZTEMPLATE")
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Button name="$parentEditEZTemplate" inherits="GOMaticMenuButtonTemplate" text="Remove All**" hidden="true">
+				<Size>
+					<AbsDimension x="85" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="$parentRenameEZTemplate">
+						<Offset>
+							<AbsDimension x="0" y="-7"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.NewEZTemplate(1)
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<Frame name="$parentEZCreator" hidden="true">
+				<Size>
+					<AbsDimension x="300" y="300"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="0" y="-166"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BORDER">
+						<FontString name="$parentTitle" enableMouse="false" inherits="GameFontNormal" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="320" y="50"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="5" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						
+						<FontString name="$parent1CheckDescription" enableMouse="false" inherits="GameFontNormal" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="300" y="50"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="5" y="-135"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+
+				</Layers>
+				<Frames>
+
+					<Button name="$parentPlusButton" inherits="GOMaticMenuButtonTemplate" text="+">
+						<Size>
+							<AbsDimension x="25" y="25"/>
+						</Size>
+						<Scripts>
+							<OnClick>
+								GrOM.AddLimitsOrRulesLine()
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<Button name="$parentNextButton" inherits="GOMaticMenuButtonTemplate">
+						<Size>
+							<AbsDimension x="55" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentTitle">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								GrOM.AdvanceEZCreator()
+							</OnClick>
+						</Scripts>
+					</Button>
+
+					<EditBox name="$parentNameBox" inherits="InputBoxTemplate" font="GameFontNormal">
+						<Size>
+							<AbsDimension x="200" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="$parent">
+								<Offset>
+									<AbsDimension x="10" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								GrOM.UIFrameFadeIn(self, .3, 0, 1)
+							</OnShow>
+						</Scripts>
+					</EditBox>
+
+					<CheckButton name="$parentMergeOption" inherits="UIRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentNameBox">
+								<Offset>
+									<AbsDimension x="0" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if self:GetChecked() then
+									GOMaticEZCreatorSeparateOption:SetChecked(not GOMaticEZCreatorSeparateOption:GetChecked())
+								else
+									self:SetChecked(true)
+								end
+							</OnClick>
+							<OnShow>
+								GrOM.UIFrameFadeIn(self, .3, 0, 1)
+							</OnShow>
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentSeparateOption" inherits="UIRadioButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentMergeOption">
+								<Offset>
+									<AbsDimension x="0" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								if self:GetChecked() then
+									GOMaticEZCreatorMergeOption:SetChecked(not GOMaticEZCreatorMergeOption:GetChecked())
+								else
+									self:SetChecked(true)
+								end
+							</OnClick>
+							<OnShow>
+								GrOM.UIFrameFadeIn(self, .3, 0, 1)
+							</OnShow>
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentDecurse1" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentSeparateOption">
+								<Offset>
+									<AbsDimension x="0" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								self:SetChecked(true)
+								GrOM.UIFrameFadeIn(self, .3, 0, 1)
+							</OnShow>
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentDecurse2" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDecurse1">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								self:SetChecked(true)
+								GrOM.UIFrameFadeIn(self, .3, 0, 1)
+							</OnShow>
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentDecurse3" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentDecurse1">
+								<Offset>
+									<AbsDimension x="110" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								self:SetChecked(true)
+								GrOM.UIFrameFadeIn(self, .3, 0, 1)
+							</OnShow>
+						</Scripts>
+					</CheckButton>
+
+					<CheckButton name="$parentDecurse4" inherits="OptionsCheckButtonTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentDecurse3">
+								<Offset>
+									<AbsDimension x="0" y="-10"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnShow>
+								self:SetChecked(true)
+								GrOM.UIFrameFadeIn(self, .3, 0, 1)
+							</OnShow>
+						</Scripts>
+					</CheckButton>
+
+
+				</Frames>
+			</Frame>
+
+			<CheckButton name="$parentSyncOut" inherits="OptionsCheckButtonTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="0" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.OnCheckBoxClick(self)
+					</OnClick>
+					<OnShow>
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+				</Scripts>
+			</CheckButton>
+
+			<Button name="$parentSyncNow" inherits="GOMaticMenuButtonTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="75" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="TOPRIGHT" relativeTo="$parentSyncOut">
+						<Offset>
+							<AbsDimension x="290" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						GrOM.SyncNow()
+					</OnClick>
+				</Scripts>
+			</Button>
+
+			<ScrollFrame name="$parentSyncScrollFrame" inherits="FauxScrollFrameTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="350" y="130"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativePoint="BOTTOMLEFT" relativeTo="$parentHide">
+						<Offset>
+							<AbsDimension x="0" y="-90"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						GrOM.ScrollFrameUpdate(self)
+						GrOM.UIFrameFadeIn(self, .3, 0, 1)
+					</OnShow>
+					<OnVerticalScroll>
+       						GrOM.FauxScrollFrame_OnVerticalScroll(self, offset, (GrOM.GetScrollFrameButtonStats(self:GetHeight())), GrOM.ScrollFrameUpdate)
+     					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>				
+				GrOM.OnLoad(self)
+				self:SetScript("OnEvent", function(...) GrOM.OnEvent(...) end)
+			</OnLoad>
+			<OnShow>
+				if GrOM_Vars.expanded then
+					GrOM.MoreClick(1)
+				end
+			</OnShow>
+			<OnMouseDown>
+				if button == "LeftButton" then
+					self:StartMoving()
+				end
+			</OnMouseDown>
+			<OnMouseUp>
+				if button == "LeftButton" then
+					local x, y = self:GetLeft() - GOMaticAnchorFrame:GetLeft(), self:GetBottom() - GOMaticAnchorFrame:GetBottom()
+					self:StopMovingOrSizing()
+					self:ClearAllPoints()
+					self:SetPoint("BOTTOMLEFT", GOMaticAnchorFrame, "BOTTOMLEFT", x, y)
+				end
+			</OnMouseUp>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="GOMaticAnchorFrame">
+		<Size>
+			<AbsDimension x="2" y="2"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMLEFT" relativeTo="UIParent">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+	</Frame>
+</Ui>
